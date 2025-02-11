@@ -15,3 +15,7 @@ This repository should help anybody who still has a Vestax VCI-100 and wants to 
  - Add last effect button for changing selected effect on EffectUnit
  - Make use of multicolors? (may be impossible without firmware update)
  - Cleanup
+
+# Developing
+- The schem.drawio is showing what functions respond to which buttons
+- the jsonconfig.json is responsible for correct linting etc.
