@@ -19,3 +19,4 @@ This repository should help anybody who still has a Vestax VCI-100 and wants to 
 # Developing
 - The schem.drawio is showing what functions respond to which buttons
 - the jsonconfig.json is responsible for correct linting etc.
+- the controllers.vsworkspace is setting up the workspace in vscode (extensions will be added)
