@@ -13,6 +13,7 @@ VestaxVCI100.beatloopSizes = [0.5, 1, 2, 4];
 VestaxVCI100.beatloopModifier = 2;
 VestaxVCI100.beatloopMinMax = {"min": 0.125, "max": 32};
 VestaxVCI100.microphonesActive = [];
+VestaxVCI100.effectsActive = [];
 VestaxVCI100.Buttons = {};
 
 VestaxVCI100.ButtonState = {"released":0x00, "pressed":0x7F};
@@ -88,6 +89,7 @@ function setLibrarySwitchLighting(value) {
   midi.sendShortMsg(0x90, 0x5D, 0x00);
   if (value.includes(2)) midi.sendShortMsg(0x90, 0x5D, 0x7F);
   
+  // Only one thats working atm
   midi.sendShortMsg(0x90, 0x5F, 0x00);
   if (value.includes(3)) midi.sendShortMsg(0x90, 0x5F, 0x7F);
   
@@ -265,6 +267,42 @@ function setEffectEnabled(deck, value = null) {
   }
 }
 
+function setEffectEnabledMaster(effectsActive = null) {
+  if (effectsActive != null) {
+    for (let deckNumber = 1; deckNumber <= 2; deckNumber ++) {
+      if (effectsActive.includes(deckNumber)) {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, "group_[Master]_enable", 1);
+      } else {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, "group_[Master]_enable", 0);
+      }
+    }
+  }
+}
+
+function setEffectEnabledHeadphones(effectsActive = null) {
+  if (effectsActive != null) {
+    for (let deckNumber = 1; deckNumber <= 2; deckNumber ++) {
+      if (effectsActive.includes(deckNumber)) {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, "group_[Headphone]_enable", 1);
+      } else {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, "group_[Headphone]_enable", 0);
+      }
+    }
+  }
+}
+
+function setEffectEnabledDecks(effectsActive = null) {
+  if (effectsActive != null) {
+    for (let deckNumber = 1; deckNumber <= 2; deckNumber ++) {
+      if (effectsActive.includes(deckNumber)) {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, `group_[Channel${deckNumber}]_enable`, 1);
+      } else {
+        engine.setValue(`[EffectRack1_EffectUnit${deckNumber}]`, `group_[Channel${deckNumber}]_enable`, 0);
+      }
+    }
+  }
+}
+
 function setHeadphoneEnabled(deck) {
   if (getHeadphoneEnabled(deck)) {
     engine.setValue(deck.group, "pfl", 0)
@@ -304,12 +342,21 @@ function getMicrophoneEnabled(deck) {
   return engine.getValue(deck.group, "talkover") == 1;
 }
 
-function getHeadphoneEnabled(deck) {
-  return engine.getValue(deck.group, "pfl") == 1;
-}
-
 function getEffectEnabled(deck) {
   return engine.getValue(`[EffectRack1_EffectUnit${deck.deckNumber}]`, "enabled") == 1
+}
+
+function getEffectsEnabledMaster() {
+  let effectsActive = [];
+
+  if (engine.getValue(`[EffectRack1_EffectUnit1]`, "group_[Master]_enable") == 1) effectsActive.push(1);
+  if (engine.getValue(`[EffectRack1_EffectUnit2]`, "group_[Master]_enable") == 1) effectsActive.push(2);
+  
+  return effectsActive;
+}
+
+function getHeadphoneEnabled(deck) {
+  return engine.getValue(deck.group, "pfl") == 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -486,7 +533,33 @@ VestaxVCI100.previewKeyHandler = function(value) {
 }
 
 VestaxVCI100.effectKeyHandler = function(value) {
+  if (value) {
+    let deck1 = VestaxVCI100.GetDeck("[Channel1]");
+    let deck2 = VestaxVCI100.GetDeck("[Channel2]");
 
+    // Restore effect states of both decks and master
+    VestaxVCI100.effectsActive = getEffectsEnabledMaster();
+    deck1.effectActive = getEffectEnabled(deck1);
+    deck2.effectActive = getEffectEnabled(deck2);
+    
+    if (VestaxVCI100.effectsActive.length == 0) {
+      setEffectEnabledDecks([]);
+      setEffectEnabledMaster([1,2]);
+      VestaxVCI100.effectsActive = [1,2];
+    } else {
+      VestaxVCI100.effectsActive = [];
+      setEffectEnabledMaster([]);
+      setEffectEnabledDecks([1,2]);
+    }
+
+    let effectsActive = [];
+
+    if (deck1.effectActive) effectsActive.push(deck1.deckNumber);
+    if (deck2.effectActive) effectsActive.push(deck2.deckNumber);
+    if (VestaxVCI100.effectsActive.length != 0) effectsActive.push(3);
+    
+    setEffectSwitchLighting(effectsActive);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -500,7 +573,8 @@ VestaxVCI100.addButton("Key5", new VestaxVCI100.Button(0x67), "key5Handler");
 VestaxVCI100.addButton("Key6", new VestaxVCI100.Button(0x66), "key6Handler");
 VestaxVCI100.addButton("Key7", new VestaxVCI100.Button(0x65), "key7Handler");
 
-VestaxVCI100.addButton("PreviewKey", new VestaxVCI100.Button(0x65), "previewKeyHandler");
+VestaxVCI100.addButton("PreviewKey", new VestaxVCI100.Button(0x5F), "previewKeyHandler");
+VestaxVCI100.addButton("EffectKey",  new VestaxVCI100.Button(0x4C), "effectKeyHandler");
 
 // -----------------------------------------------------------------------------
 // -------------------------------- Add Deck/s ---------------------------------
@@ -598,6 +672,7 @@ VestaxVCI100.Deck.prototype.effectHandler = function(value) {
     let other = VestaxVCI100.GetDeck(VestaxVCI100.FlipMainDeck[this.group]);
 
     // Restore effect states of both decks
+    VestaxVCI100.effectsActive = getEffectsEnabledMaster();
     this.effectActive = getEffectEnabled(this);
     other.effectActive = getEffectEnabled(other);
 
@@ -605,10 +680,17 @@ VestaxVCI100.Deck.prototype.effectHandler = function(value) {
     this.effectActive = !this.effectActive;
     setEffectEnabled(this);
 
+    if (VestaxVCI100.effectsActive.length == 0) {
+      setEffectEnabledMaster([]);
+    } else {
+      setEffectEnabledMaster([1,2]);
+    }
+
     let effectsActive = [];
 
     if (this.effectActive)  effectsActive.push(this.deckNumber);
     if (other.effectActive) effectsActive.push(other.deckNumber);
+    if (VestaxVCI100.effectsActive.length != 0) effectsActive.push(3);
     
     setEffectSwitchLighting(effectsActive);
   }
@@ -632,6 +714,7 @@ VestaxVCI100.Deck.prototype.headphoneHandler = function(value) {
     if (this.headphoneActive)  headphonesActive.push(this.deckNumber);
     if (other.headphoneActive) headphonesActive.push(other.deckNumber);
     
+    setEffectEnabledHeadphones(headphonesActive);
     setHeadphoneSwitchLighting(headphonesActive);
   }
 }
@@ -695,6 +778,11 @@ VestaxVCI100.init = function (id) {
   setEffectEnabled(VestaxVCI100.Decks.Left, 0)
   setEffectEnabled(VestaxVCI100.Decks.Right, 0)
 
+  // Set Effect bindings for all FX Buttons
+  setEffectEnabledMaster([]);
+  setEffectEnabledHeadphones([]);
+  setEffectEnabledDecks([1,2]);
+
   // Set Lighting to OFF for Headphone Buttons
   setHeadphoneSwitchLighting([]);
   
@@ -723,6 +811,11 @@ VestaxVCI100.shutdown = function (id) {
   setEffectSwitchLighting([]);
   setEffectEnabled(VestaxVCI100.Decks.Left, 0)
   setEffectEnabled(VestaxVCI100.Decks.Right, 0)
+
+  // Set Effect bindings for all FX Buttons
+  setEffectEnabledMaster([]);
+  setEffectEnabledHeadphones([]);
+  setEffectEnabledDecks([1,2]);
 
   // Set Lighting to OFF for Headphone Buttons
   setHeadphoneSwitchLighting([]);
