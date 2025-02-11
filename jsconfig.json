@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "checkJs": true,
+        "lib": [ "ES2016" ]
+    },
+    "include": [
+        "Vestax-VCI-100-scripts.js",
+        "C:/Program Files/Mixxx/controllers/common-controller-scripts.js",
+        "C:/Program Files/Mixxx/controllers/engine-api.d.ts",
+        "C:/Program Files/Mixxx/controllers/color-mapper-api.d.ts",
+        "C:/Program Files/Mixxx/controllers/console-api.d.ts",
+        "C:/Program Files/Mixxx/controllers/midi-controller-api.d.ts"
+    ]
+}
