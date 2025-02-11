@@ -587,6 +587,15 @@
                 </options>
             </control>
             <control>
+                <group>[Master]</group>
+                <key>VestaxVCI100.effectKey</key>
+                <status>0x90</status>
+                <midino>0x4C</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
                 <group>[EffectRack1_EffectUnit2_Effect3]</group>
                 <key>meta</key>
                 <status>0xB0</status>
@@ -978,12 +987,3 @@
             <output>
                 <group>[EffectRack1_EffectUnit2_Effect3]</group>
                 <key>enabled</key>
-                <status>0x90</status>
-                <midino>0x5A</midino>
-                <on>0x00</on>
-                <off>0x7F</off>
-                <maximum>0</maximum>
-            </output>
-        </outputs>
-    </controller>
-</MixxxControllerPreset>
