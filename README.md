@@ -6,15 +6,12 @@ This repository should help anybody who still has a Vestax VCI-100 and wants to 
    - Support Sync lock with key2+sync?
  2. Finish effects
    - Focused effect gets master controls for volume
-   - A and B should correspond to first effects settings
-   - fx1 and fx2 should be automatically correctly mapped to decks 1 and 2 (master to none)
-   - Add last effect button for changing selected effect on EffectUnit (example)
+   - A and B should correspond to first effects settings (in specific cases)
  3. Add LED indications to eject and play button for loaded preview-deck
    - show option on preview button
    - Should disable loop/hotcue mode altogether to be able to use the buttons
    - Ejecting should also disable the preview mode
- 5. Add headphone effect pre-listen option
- 6. Cleanup (use more builtin functions from mixxx)
+ 4. Cleanup (use more builtin functions from mixxx)
 
 # Developing
 - The schem.drawio is showing what functions respond to which buttons
