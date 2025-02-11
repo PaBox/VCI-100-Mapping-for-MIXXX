@@ -3,7 +3,6 @@ This repository should help anybody who still has a Vestax VCI-100 and wants to 
 
  Missing:
  - Middle/Top/Side Effect Buttons should light up if in use
- - Effect parameters should be correctly mapped and light up when ON
  - Effect selection should work
  - Effect focus should work (Focused effect gets master controls for volume)
    - A and B should correspond to first effects settings
