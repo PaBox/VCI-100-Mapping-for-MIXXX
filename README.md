@@ -8,7 +8,7 @@ This repository should help anybody who still has a Vestax VCI-100 and wants to 
  2. Cleanup (use more builtin functions from mixxx, more consistent and reusable code)
 
 # Developing
-- The schem.drawio is showing what functions respond to which buttons
+- The schem.drawio is showing the naming scheme for internal functions with their corresponding buttons
 - the jsonconfig.json is responsible for correct linting etc.
 - the controllers.vsworkspace is setting up the workspace in vscode (extensions will be added)
 
