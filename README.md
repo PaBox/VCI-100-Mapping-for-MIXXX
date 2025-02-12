@@ -2,16 +2,10 @@
 This repository should help anybody who still has a Vestax VCI-100 and wants to use MIXXX without sacrificing the capabilities off this controller.
 
  Missing (priorities top to bottom):
- 1. Sync button should use colours if synced/not synced and be lockable
-   - Support Sync lock with key2+sync?
- 2. Finish effects
+ 1. Finish effects
    - Focused effect gets master controls for volume
    - A and B should correspond to first effects settings (in specific cases)
- 3. Add LED indications to eject and play button for loaded preview-deck
-   - show option on preview button
-   - Should disable loop/hotcue mode altogether to be able to use the buttons
-   - Ejecting should also disable the preview mode
- 4. Cleanup (use more builtin functions from mixxx)
+ 2. Cleanup (use more builtin functions from mixxx, more consistent and reusable code)
 
 # Developing
 - The schem.drawio is showing what functions respond to which buttons
