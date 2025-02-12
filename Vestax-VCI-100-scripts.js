@@ -6,7 +6,6 @@ VestaxVCI100 = new function() {}
 
 VestaxVCI100.group = "[Master]";
 VestaxVCI100.loopHotcueDeck = null;
-VestaxVCI100.shiftMode = false;
 VestaxVCI100.preview = false;
 VestaxVCI100.jogPlaylistScrollMode = false;
 VestaxVCI100.beatloopSizes = [0.5, 1, 2, 4];
@@ -180,11 +179,11 @@ function setBeatloopLighting(deck) {
 
 function setPreviewButtonLighting(deck) {
   if (getPlay(deck)) {
-    setLibrarySwitchLighting([3]);
-    setLoopHotcueButtonLighting([3]);
-  } else {
-    setLibrarySwitchLighting([]);
     setLoopHotcueButtonLighting([]);
+    setLibrarySwitchLighting([3]);
+  } else {
+    setLoopHotcueButtonLighting([1,3]);
+    setLibrarySwitchLighting([3]);
   }
 }
 
@@ -364,7 +363,10 @@ function getHeadphoneEnabled(deck) {
 // -----------------------------------------------------------------------------
 
 VestaxVCI100.key1Handler = function(value) {
-  var deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
+  let previewDeck = VestaxVCI100.Decks.Preview;
+
+  VestaxVCI100.preview = getTrackLoaded(previewDeck);
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -375,16 +377,25 @@ VestaxVCI100.key1Handler = function(value) {
         deck.beatloopActive = false;
         setBeatloopButtonStateLighting(deck);
       }
-  
+
       setBeatloopActivate(deck);
-    } else {
-      setEject(VestaxVCI100.Decks.Preview);
+    } else if (VestaxVCI100.preview) {
+      let previewDeck = VestaxVCI100.Decks.Preview;
+
+      if (!getPlay(previewDeck)) {
+        setEject(previewDeck);
+
+        setLoopHotcueButtonLighting([]);
+        setLibrarySwitchLighting([]);
+
+        VestaxVCI100.preview = false;
+      }
     }
   }
 }
 
 VestaxVCI100.key2Handler = function(value) {
-  var deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -397,7 +408,10 @@ VestaxVCI100.key2Handler = function(value) {
 }
 
 VestaxVCI100.key3Handler = function(value) {
-  var deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
+  let previewDeck = VestaxVCI100.Decks.Preview;
+
+  VestaxVCI100.preview = getTrackLoaded(previewDeck);
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -405,7 +419,7 @@ VestaxVCI100.key3Handler = function(value) {
         setBeatloopSizeLighting(deck, 1/VestaxVCI100.beatloopModifier);
         setBeatloopHalve(deck);
       }
-    } else {
+    } else if (VestaxVCI100.preview) {
       let previewDeck = VestaxVCI100.Decks.Preview;
   
       setPlay(previewDeck);
@@ -456,7 +470,7 @@ function micDeckHandler(micDeck, keyNumber) {
 
 VestaxVCI100.key4Handler = function(value) {
   let keyNumber = 1;
-  let deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -473,7 +487,7 @@ VestaxVCI100.key4Handler = function(value) {
 
 VestaxVCI100.key5Handler = function(value) {
   let keyNumber = 2;
-  let deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -490,7 +504,7 @@ VestaxVCI100.key5Handler = function(value) {
 
 VestaxVCI100.key6Handler = function(value) {
   let keyNumber = 3;
-  let deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -507,7 +521,7 @@ VestaxVCI100.key6Handler = function(value) {
 
 VestaxVCI100.key7Handler = function(value) {
   let keyNumber = 4;
-  let deck = this.loopHotcueDeck;
+  let deck = VestaxVCI100.loopHotcueDeck;
 
   if (value) {
     if (deck != null && deck.loop) {
@@ -524,18 +538,33 @@ VestaxVCI100.key7Handler = function(value) {
 
 VestaxVCI100.previewKeyHandler = function(value) {
   if (value) {
+    let deck1 = VestaxVCI100.Decks.Left;
+    let deck2 = VestaxVCI100.Decks.Right;
     let previewDeck = VestaxVCI100.Decks.Preview;
 
     setLoadTrack(previewDeck);
     setPlayNull(previewDeck);
     setPreviewButtonLighting(previewDeck);
+    setLibrarySwitchLighting([3]);
+
+    // Disables loop/hotcue mode
+    deck1.loop = false;
+    deck1.hotcue = false;
+    deck2.loop = false;
+    deck2.hotcue = false;
+    setHotcueSwitchLighting([]);
+    setLoopSwitchLighting([]);
+    setLoopHotcueButtonLighting([1,3]);
+
+    VestaxVCI100.loopHotcueDeck = null;
+    VestaxVCI100.preview = true;
   }
 }
 
 VestaxVCI100.effectKeyHandler = function(value) {
   if (value) {
-    let deck1 = VestaxVCI100.GetDeck("[Channel1]");
-    let deck2 = VestaxVCI100.GetDeck("[Channel2]");
+    let deck1 = VestaxVCI100.Decks.Left;
+    let deck2 = VestaxVCI100.Decks.Right;
 
     // Restore effect states of both decks and master
     VestaxVCI100.effectsActive = getEffectsEnabledMaster();
@@ -587,12 +616,12 @@ VestaxVCI100.Deck = function (deckNumber, group) {
   this.loop                  = false;
   this.hotcue                = false;
   this.hotcueActive          = [];
+  this.headphoneActive       = false;
+  this.effectActive          = false;
   this.beatloopSize          = 4;
   this.beatloopActive        = false;
   this.beatloopOverSize      = false;
   this.beatloopUnderSize     = false;
-  this.headphoneActive       = false;
-  this.effectActive          = false;
   this.Buttons               = {};
 }
 
@@ -615,7 +644,21 @@ VestaxVCI100.Deck.prototype.loopHandler = function(value) {
       setLoopSwitchLighting([]);
       setLoopHotcueLighting([]);
       setLoopHotcueButtonLighting([]);
+
+      if (getTrackLoaded(VestaxVCI100.Decks.Preview)) {
+        VestaxVCI100.preview = true;
+
+        setPreviewButtonLighting(VestaxVCI100.Decks.Preview);
+      }
+
       return;
+    }
+
+    // Disables Preview Mode
+    if (!this.loop) {
+      VestaxVCI100.preview = false;
+      setLibrarySwitchLighting([]);
+      setLoopHotcueButtonLighting([]);
     }
     
     // Restore Lighting state of loop activated button lights
@@ -645,7 +688,21 @@ VestaxVCI100.Deck.prototype.hotcueHandler = function(value) {
       setHotcueSwitchLighting([]);
       setLoopHotcueLighting([]);
       setLoopHotcueButtonLighting([]);
+
+      if (getTrackLoaded(VestaxVCI100.Decks.Preview)) {
+        VestaxVCI100.preview = true;
+
+        setPreviewButtonLighting(VestaxVCI100.Decks.Preview);
+      }
+
       return
+    }
+
+    // Disables Preview Mode
+    if (!this.hotcue) {
+      VestaxVCI100.preview = false;
+      setLibrarySwitchLighting([]);
+      setLoopHotcueButtonLighting([]);
     }
     
     // Restore Lighting state of hotcue activated button lights
@@ -756,6 +813,8 @@ VestaxVCI100.Decks.Left.addButton(  "Loop",        new VestaxVCI100.Button(0x42)
 VestaxVCI100.Decks.Right.addButton( "Loop",        new VestaxVCI100.Button(0x43), "loopHandler");
 VestaxVCI100.Decks.Left.addButton(  "Hotcue",      new VestaxVCI100.Button(0x44), "hotcueHandler");
 VestaxVCI100.Decks.Right.addButton( "Hotcue",      new VestaxVCI100.Button(0x45), "hotcueHandler");
+VestaxVCI100.Decks.Left.addButton(  "Sync",        new VestaxVCI100.Button(0x46), "syncHandler");
+VestaxVCI100.Decks.Right.addButton( "Sync",        new VestaxVCI100.Button(0x47), "syncHandler");
 VestaxVCI100.Decks.Left.addButton(  "Effect",      new VestaxVCI100.Button(0x4A), "effectHandler");
 VestaxVCI100.Decks.Right.addButton( "Effect",      new VestaxVCI100.Button(0x4B), "effectHandler");
 VestaxVCI100.Decks.Left.addButton(  "Headphone",   new VestaxVCI100.Button(0x48), "headphoneHandler");

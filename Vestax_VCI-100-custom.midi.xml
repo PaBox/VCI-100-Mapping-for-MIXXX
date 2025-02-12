@@ -480,7 +480,7 @@
             </control>
             <control>
                 <group>[Channel1]</group>
-                <key>beatsync</key>
+                <key>sync_enabled</key>
                 <status>0x90</status>
                 <midino>0x46</midino>
                 <options>
@@ -498,7 +498,7 @@
             </control>
             <control>
                 <group>[Channel2]</group>
-                <key>beatsync</key>
+                <key>sync_enabled</key>
                 <status>0x90</status>
                 <midino>0x47</midino>
                 <options>
@@ -913,10 +913,28 @@
                 <maximum>0</maximum>
             </output>
             <output>
+                <group>[Channel1]</group>
+                <key>sync_enabled</key>
+                <status>0x90</status>
+                <midino>0x46</midino>
+                <on>0x00</on>
+                <off>0x7F</off>
+                <maximum>0</maximum>
+            </output>
+            <output>
                 <group>[Channel2]</group>
                 <key>play</key>
                 <status>0x90</status>
                 <midino>0x36</midino>
+                <on>0x00</on>
+                <off>0x7F</off>
+                <maximum>0</maximum>
+            </output>
+            <output>
+                <group>[Channel2]</group>
+                <key>sync_enabled</key>
+                <status>0x90</status>
+                <midino>0x47</midino>
                 <on>0x00</on>
                 <off>0x7F</off>
                 <maximum>0</maximum>
@@ -987,3 +1005,12 @@
             <output>
                 <group>[EffectRack1_EffectUnit2_Effect3]</group>
                 <key>enabled</key>
+                <status>0x90</status>
+                <midino>0x5A</midino>
+                <on>0x00</on>
+                <off>0x7F</off>
+                <maximum>0</maximum>
+            </output>
+        </outputs>
+    </controller>
+</MixxxControllerPreset>
